@@ -22,47 +22,47 @@ This script can be run from any host as long as the following prerequesites are 
 	--------------------------
 	Printing VSD Audit Summary
 	--------------------------
-	Enterprise Name: __vns0__
-	Number of L3 domains: __2__
+	Enterprise Name: vns0
+	Number of L3 domains: 2
 	L3 Domain details: 
 		L3 DOm :
-			 Zones: __3__
-			 Subnets: __4__
-			 Number of vPorts: __3__ (Type Bridge: __3__ Type Host: __0__)
-			 Underlay Breakout settings: Underlay Enabled: __ENABLED__ PAT Enabled: __ENABLED__
-			 DPI Setting: __DISABLED__
+			 Zones: 3
+			 Subnets: 4
+			 Number of vPorts: 3 (Type Bridge: 3 Type Host: 0)
+			 Underlay Breakout settings: Underlay Enabled: ENABLED PAT Enabled: ENABLED
+			 DPI Setting: DISABLED
 			 Ingress ACL Rules:
-				 Name: __Allow All__ Active: __True__ Default Allow IP: __True__ Default Allow Non IP: __True__ Allow Address Spoofing: __True__
-					 Priority: __100__ Description: __Allow BGP__ Source: __ANY__ Destination: __ANY__ Protocol: __6__
-					 Source Port: __*__ Destination Port: __179__ Action: __FORWARD__
-					 Stateful: __True__ Stats Logging Enabled: __True__ Flow Logging Enabled: __True__
+				 Name: Allow All Active: True Default Allow IP: True Default Allow Non IP: True Allow Address Spoofing: True
+					 Priority: 100 Description: Allow BGP Source: ANY Destination: ANY Protocol: 6
+					 Source Port: * Destination Port: 179 Action: FORWARD
+					 Stateful: True Stats Logging Enabled: True Flow Logging Enabled: True
 	
-					 Priority: __200__ Description: __Drop HTTP__ Source: __ANY__ Destination: __ANY__ Protocol: __6__
-					 Source Port: __*__ Destination Port: __80__ Action: __DROP__
-					 Stateful: __False__ Stats Logging Enabled: __True__ Flow Logging Enabled: __False__
+					 Priority: 200 Description: Drop HTTP Source: ANY Destination: ANY Protocol: 6
+					 Source Port: * Destination Port: 80 Action: DROP
+					 Stateful: False Stats Logging Enabled: True Flow Logging Enabled: False
 	
 			 Egress ACL Rules:
-				 Name: __Allow All__ Active: __True__ Default Allow IP: __True__ Default Allow Non IP: __True__ Install ACL Implicit Rules: __True__
+				 Name: Allow All Active: True Default Allow IP: True Default Allow Non IP: True Install ACL Implicit Rules: True
 		L3 Test :
-			 Zones: __0__
-			 Subnets: __0__
-			 Number of vPorts: __0__ (Type Bridge: __0__ Type Host: __0__)
-			 Underlay Breakout settings: Underlay Enabled: __DISABLED__ PAT Enabled: __DISABLED__
-			 DPI Setting: __DISABLED__
+			 Zones: 0
+			 Subnets: 0
+			 Number of vPorts: 0 (Type Bridge: 0 Type Host: 0)
+			 Underlay Breakout settings: Underlay Enabled: DISABLED PAT Enabled: DISABLED
+			 DPI Setting: DISABLED
 			 Ingress ACL Rules:
-				  __None Defined__ 
+				  None Defined 
 			 Egress ACL Rules:
-				  __None Defined__ 
+				  None Defined 
 	Infrastructure Details: 
-		Number of Network Services Gateways configured: __8__ (Status Active: __5__Other: __3__)
-		Personality distribution: NSG: __6__ NSG-BR: __1__ NSG-UBR: __1__
-		Single/Dual Uplink distribution (only including personality NSG): Single Uplink: __5__ Dual Uplink: __1__
-		Uplink connection distribution (only including personality NSG): Dynamic: __4__ Static: __1__ PPPoE: __1__ LTE: __0__
-		Number of uplinks with NAT probes enabled: __13__
-		Number of uplinks with Traffic Through UBR Only flag enabled: __1__
-		Number of uplinks with an IKE tunnel configured: __1__
-		Number of uplinks with BGP configured: __1__
-		Number of uplinks with a PAT Pool configured: __1__
-		Number of uplinks with Egress QoS Profile: __1__
+		Number of Network Services Gateways configured: 8 (Status Active: 5Other: 3)
+		Personality distribution: NSG: 6 NSG-BR: 1 NSG-UBR: 1
+		Single/Dual Uplink distribution (only including personality NSG): Single Uplink: 5 Dual Uplink: 1
+		Uplink connection distribution (only including personality NSG): Dynamic: 4 Static: 1 PPPoE: 1 LTE: 0
+		Number of uplinks with NAT probes enabled: 13
+		Number of uplinks with Traffic Through UBR Only flag enabled: 1
+		Number of uplinks with an IKE tunnel configured: 1
+		Number of uplinks with BGP configured: 1
+		Number of uplinks with a PAT Pool configured: 1
+		Number of uplinks with Egress QoS Profile: 1
 	--------------------------
 
