@@ -54,7 +54,7 @@ This script can be run from any host as long as the following prerequesites are 
 			 Egress ACL Rules:
 				  None Defined 
 	Infrastructure Details: 
-		Number of Network Services Gateways configured: 8 (Status Active: 5Other: 3)
+		Number of Network Services Gateways configured: 8 (Status Active: 5 Other: 3)
 		Personality distribution: NSG: 6 NSG-BR: 1 NSG-UBR: 1
 		Single/Dual Uplink distribution (only including personality NSG): Single Uplink: 5 Dual Uplink: 1
 		Uplink connection distribution (only including personality NSG): Dynamic: 4 Static: 1 PPPoE: 1 LTE: 0
