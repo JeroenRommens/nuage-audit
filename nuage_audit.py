@@ -15,7 +15,8 @@ Options:
 from docopt import docopt
 from vspk import v5_0 as vsdk
 import json
-
+import logging
+import datetime
 
 def getargs():
     return docopt(__doc__, version="nuage-audit 0.0.1")
@@ -24,6 +25,14 @@ def execute():
     main(getargs())
 
 def main(args):
+    date = datetime.datetime.now()
+    logger = logging.getLogger('nuage-audit')
+    logfile_name = 'nuage-audit-'+ str(date.day) +'-'+str(date.month)+'-'+str(date.year)
+    hdlr = logging.FileHandler(logfile_name)
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    hdlr.setFormatter(formatter)
+    logger.addHandler(hdlr) 
+    logger.setLevel(logging.INFO)
     api_url = "https://"+str(args['--vsd'])+":8443"
     try:
         session = vsdk.NUVSDSession(username='csproot', password='csproot', enterprise='csp', api_url=api_url)
@@ -37,20 +46,28 @@ def main(args):
     enterprise = csproot.enterprises.get_first(filter=enterprise_filter_str)
     domains = enterprise.domains.get()
 
+    logger.info('VSD-Audit is starting ...')
     print("--------------------------")
     print("Printing VSD Audit Summary")
     print("--------------------------")
     print("Enterprise Name: "+"\033[1m"+enterprise.name+"\033[0m")
     print("Number of L3 domains: "+"\033[1m"+str(len(domains))+"\033[0m")
     print("L3 Domain details: ")
+    logger.info(enterprise.to_dict())
     for domain in domains:
+        logger.info(domain.to_dict())
         print("\t" + domain.name +" :")
-        subnets = domain.subnets.get()
         zones = domain.zones.get()
+        for zone in zones:
+            logger.info(zone.to_dict())
+        subnets = domain.subnets.get()
+        for subnet in subnets:
+            logger.info(subnet.to_dict())
         vports = domain.vports.get()
         number_bridge_vports = 0
         number_host_vports = 0
         for vport in vports:
+            logger.info(vport.to_dict())
             if vport.type == 'BRIDGE':
                 number_bridge_vports += 1
             elif vport.type == 'HOST':
@@ -67,9 +84,11 @@ def main(args):
         if len(ingress_acl_templates) == 0:
             print("\t\t\t \033[1m None Defined \033[0m")
         for ingress_acl_template in ingress_acl_templates:
+            logger.info(ingress_acl_template.to_dict())
             print("\t\t\t Name: "+"\033[1m"+ingress_acl_template.name+"\033[0m"+" Active: "+"\033[1m"+str(ingress_acl_template.active)+"\033[0m"+" Default Allow IP: "+"\033[1m"+str(ingress_acl_template.default_allow_ip)+"\033[0m"+" Default Allow Non IP: "+"\033[1m"+str(ingress_acl_template.default_allow_non_ip)+"\033[0m"+" Allow Address Spoofing: "+"\033[1m"+str(ingress_acl_template.allow_address_spoof)+"\033[0m")
             ingress_acl_entry_templates = ingress_acl_template.ingress_acl_entry_templates.get()
             for ingress_acl_entry_template in ingress_acl_entry_templates:
+                logger.info(ingress_acl_entry_template.to_dict())
                 if ingress_acl_entry_template.associated_l7_application_signature_id == None:
                     if ingress_acl_entry_template.protocol == 'ANY':
                         print("\t\t\t\t Priority: "+"\033[1m"+str(ingress_acl_entry_template.priority)+"\033[0m"+" Description: "+"\033[1m"+str(ingress_acl_entry_template.description)+"\033[0m"+" Source: "+"\033[1m"+str(ingress_acl_entry_template.network_type)+"\033[0m"+" Destination: "+"\033[1m"+str(ingress_acl_entry_template.location_type)+"\033[0m"+" Protocol: "+"\033[1m"+str(ingress_acl_entry_template.protocol)+"\033[0m")
@@ -85,6 +104,7 @@ def main(args):
         if len(egress_acl_templates) == 0:
             print("\t\t\t \033[1m None Defined \033[0m")
         for egress_acl_template in egress_acl_templates:
+            logger.info(egress_acl_template.to_dict())
             print("\t\t\t Name: "+"\033[1m"+egress_acl_template.name+"\033[0m"+" Active: "+"\033[1m"+str(egress_acl_template.active)+"\033[0m"+" Default Allow IP: "+"\033[1m"+str(egress_acl_template.default_allow_ip)+"\033[0m"+" Default Allow Non IP: "+"\033[1m"+str(egress_acl_template.default_allow_non_ip)+"\033[0m"+" Install ACL Implicit Rules: "+"\033[1m"+str(egress_acl_template.default_install_acl_implicit_rules)+"\033[0m")
 
 
@@ -109,6 +129,7 @@ def main(args):
     number_egressqos = 0
 
     for ns_gateway in ns_gateways:
+        logger.info(ns_gateway.to_dict())
         if ns_gateway.bootstrap_status == 'ACTIVE':
             number_nsg_active += 1
         if ns_gateway.personality == 'NSG':
@@ -117,22 +138,30 @@ def main(args):
                 number_nsg_single_uplink += 1
             else:
                 number_nsg_dual_uplink += 1
+
             number_pppoe += getPPPoE(ns_gateway)
             number_static += getStatic(ns_gateway)
             number_dynamic += getDynamic(ns_gateway)
             number_lte += getLTE(ns_gateway)
-            number_uplinks_nat_probes += getNATflag(ns_gateway)
-            number_uplinks_ubr_only += getUBRflag(ns_gateway)
-            number_ike_tunnels += getIKE(ns_gateway)
-            number_uplinks_bgp += getBGP(ns_gateway)
-            number_uplinks_patpool += getPATNAT(ns_gateway) 
-            number_egressqos += getEgressQoS(ns_gateway)
+            number_uplinks_patpool += getPATNAT(ns_gateway)
+
+            ns_ports = ns_gateway.ns_ports.get()
+
+            for ns_port in ns_ports:
+                logger.info(ns_port.to_dict())
+                number_egressqos += getEgressQoS(ns_port)
+                number_uplinks_bgp += getBGP(ns_port)
+                number_uplinks_nat_probes += getNATflag(ns_port)
+                number_uplinks_ubr_only += getUBRflag(ns_port)
+                number_ike_tunnels += getIKE(ns_port)
 
         elif ns_gateway.personality == 'NSGBR':
             number_nsgbr += 1
         elif ns_gateway.personality == 'NSGDUC':
             number_nsgubr += 1
 
+
+    ## Printing output of NSG data collection
     print("\tNumber of Network Services Gateways configured: "+"\033[1m"+str(len(ns_gateways))+"\033[0m" + " (Status Active: "+"\033[1m"+str(number_nsg_active)+"\033[0m"+" Other: "+"\033[1m"+str(len(ns_gateways)-number_nsg_active)+"\033[0m"+")")
     print("\tPersonality distribution: NSG: "+"\033[1m"+str(number_nsg)+"\033[0m"+" NSG-BR: "+"\033[1m"+str(number_nsgbr)+"\033[0m"+" NSG-UBR: "+"\033[1m"+str(number_nsgubr)+"\033[0m")
     print("\tSingle/Dual Uplink distribution (only including personality NSG): Single Uplink: "+"\033[1m"+str(number_nsg_single_uplink)+"\033[0m"+" Dual Uplink: "+"\033[1m"+str(number_nsg_dual_uplink)+"\033[0m")
@@ -150,15 +179,13 @@ def main(args):
     #print("--- Enterprise JSON Object ---")
     #print json.dumps(enterprise.to_dict(), indent=3)
 
-def getEgressQoS(ns_gateway):
-    ns_ports = ns_gateway.ns_ports.get()
+def getEgressQoS(ns_port):
     num_egressqos = 0
-    for ns_port in ns_ports:
-        if ns_port.port_type == 'NETWORK':
-            vlans = ns_port.vlans.get()
-            for vlan in vlans:
-                if vlan.associated_egress_qos_policy_id != None:
-                    num_egressqos += 1
+    if ns_port.port_type == 'NETWORK':
+        vlans = ns_port.vlans.get()
+        for vlan in vlans:
+            if vlan.associated_egress_qos_policy_id != None:
+                num_egressqos += 1
     return num_egressqos
 
 
@@ -166,30 +193,25 @@ def getPATNAT(ns_gateway):
     patnat_pools = ns_gateway.patnat_pools.get()
     return len(patnat_pools)
 
-def getIKE(ns_gateway):
-    ns_ports = ns_gateway.ns_ports.get()
+def getIKE(ns_port):
     num_ike = 0
-    for ns_port in ns_ports:
-        if ns_port.port_type == 'NETWORK':
-            vlans = ns_port.vlans.get()
-            for vlan in vlans:
-                ike_gateway_connections = vlan.ike_gateway_connections.get()
-                if len(ike_gateway_connections) > 0:
-                    num_ike += 1
+    if ns_port.port_type == 'NETWORK':
+        vlans = ns_port.vlans.get()
+        for vlan in vlans:
+            ike_gateway_connections = vlan.ike_gateway_connections.get()
+            if len(ike_gateway_connections) > 0:
+                num_ike += 1
     return num_ike
 
-def getBGP(ns_gateway):
-    ns_ports = ns_gateway.ns_ports.get()
+def getBGP(ns_port):
     num_bgp = 0
-    for ns_port in ns_ports:
-        if ns_port.port_type == 'NETWORK':
-            vlans = ns_port.vlans.get()
-            for vlan in vlans:
-                bgp_neighbors = vlan.bgp_neighbors.get()
-                if len(bgp_neighbors) > 0:
-                    num_bgp += 1
+    if ns_port.port_type == 'NETWORK':
+        vlans = ns_port.vlans.get()
+        for vlan in vlans:
+            bgp_neighbors = vlan.bgp_neighbors.get()
+            if len(bgp_neighbors) > 0:
+                num_bgp += 1
     return num_bgp
-
 
 def isSingleUplink(ns_gateway):
     ns_ports = ns_gateway.ns_ports.get()
@@ -202,20 +224,16 @@ def isSingleUplink(ns_gateway):
     else:
         return False
 
-def getNATflag(ns_gateway):
-    ns_ports = ns_gateway.ns_ports.get()
+def getNATflag(ns_port):
     nat_flags = 0
-    for ns_port in ns_ports:
-        if ns_port.enable_nat_probes == True and ns_port.port_type == 'NETWORK':
-            nat_flags += 1
+    if ns_port.enable_nat_probes == True and ns_port.port_type == 'NETWORK':
+        nat_flags += 1
     return nat_flags
 
-def getUBRflag(ns_gateway):
-    ns_ports = ns_gateway.ns_ports.get()
+def getUBRflag(ns_port):
     ubr_flags = 0
-    for ns_port in ns_ports:
-        if ns_port.traffic_through_ubr_only == True:
-            ubr_flags += 1
+    if ns_port.traffic_through_ubr_only == True:
+        ubr_flags += 1
     return ubr_flags
 
 def getPPPoE(ns_gateway):
