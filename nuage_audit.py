@@ -71,9 +71,14 @@ def main(args):
             ingress_acl_entry_templates = ingress_acl_template.ingress_acl_entry_templates.get()
             for ingress_acl_entry_template in ingress_acl_entry_templates:
                 if ingress_acl_entry_template.associated_l7_application_signature_id == None:
-                    print("\t\t\t\t Priority: "+"\033[1m"+str(ingress_acl_entry_template.priority)+"\033[0m"+" Description: "+"\033[1m"+str(ingress_acl_entry_template.description)+"\033[0m"+" Source: "+"\033[1m"+str(ingress_acl_entry_template.network_type)+"\033[0m"+" Destination: "+"\033[1m"+str(ingress_acl_entry_template.location_type)+"\033[0m"+" Protocol: "+"\033[1m"+str(ingress_acl_entry_template.protocol)+"\033[0m")
-                    print("\t\t\t\t Source Port: "+"\033[1m"+str(ingress_acl_entry_template.source_port)+"\033[0m"+" Destination Port: "+"\033[1m"+ingress_acl_entry_template.destination_port+"\033[0m"+" Action: "+"\033[1m"+str(ingress_acl_entry_template.action)+"\033[0m")
-                    print("\t\t\t\t Stateful: "+"\033[1m"+str(ingress_acl_entry_template.stateful)+"\033[0m"+" Stats Logging Enabled: "+"\033[1m"+str(ingress_acl_entry_template.stats_logging_enabled)+"\033[0m"+" Flow Logging Enabled: "+"\033[1m"+str(ingress_acl_entry_template.flow_logging_enabled)+"\033[0m"+"\n")
+                    if ingress_acl_entry_template.protocol == 'ANY':
+                        print("\t\t\t\t Priority: "+"\033[1m"+str(ingress_acl_entry_template.priority)+"\033[0m"+" Description: "+"\033[1m"+str(ingress_acl_entry_template.description)+"\033[0m"+" Source: "+"\033[1m"+str(ingress_acl_entry_template.network_type)+"\033[0m"+" Destination: "+"\033[1m"+str(ingress_acl_entry_template.location_type)+"\033[0m"+" Protocol: "+"\033[1m"+str(ingress_acl_entry_template.protocol)+"\033[0m")
+                        print("\t\t\t\t Action: "+"\033[1m"+str(ingress_acl_entry_template.action)+"\033[0m")
+                        print("\t\t\t\t Stateful: "+"\033[1m"+str(ingress_acl_entry_template.stateful)+"\033[0m"+" Stats Logging Enabled: "+"\033[1m"+str(ingress_acl_entry_template.stats_logging_enabled)+"\033[0m"+" Flow Logging Enabled: "+"\033[1m"+str(ingress_acl_entry_template.flow_logging_enabled)+"\033[0m"+"\n")
+                    else:
+                        print("\t\t\t\t Priority: "+"\033[1m"+str(ingress_acl_entry_template.priority)+"\033[0m"+" Description: "+"\033[1m"+str(ingress_acl_entry_template.description)+"\033[0m"+" Source: "+"\033[1m"+str(ingress_acl_entry_template.network_type)+"\033[0m"+" Destination: "+"\033[1m"+str(ingress_acl_entry_template.location_type)+"\033[0m"+" Protocol: "+"\033[1m"+str(ingress_acl_entry_template.protocol)+"\033[0m")
+                        print("\t\t\t\t Source Port: "+"\033[1m"+str(ingress_acl_entry_template.source_port)+"\033[0m"+" Destination Port: "+"\033[1m"+ingress_acl_entry_template.destination_port+"\033[0m"+" Action: "+"\033[1m"+str(ingress_acl_entry_template.action)+"\033[0m")
+                        print("\t\t\t\t Stateful: "+"\033[1m"+str(ingress_acl_entry_template.stateful)+"\033[0m"+" Stats Logging Enabled: "+"\033[1m"+str(ingress_acl_entry_template.stats_logging_enabled)+"\033[0m"+" Flow Logging Enabled: "+"\033[1m"+str(ingress_acl_entry_template.flow_logging_enabled)+"\033[0m"+"\n")
 
         egress_acl_templates = domain.egress_acl_templates.get()
         print("\t\t Egress ACL Rules:")
@@ -201,7 +206,7 @@ def getNATflag(ns_gateway):
     ns_ports = ns_gateway.ns_ports.get()
     nat_flags = 0
     for ns_port in ns_ports:
-        if ns_port.enable_nat_probes == True:
+        if ns_port.enable_nat_probes == True and ns_port.port_type == 'NETWORK':
             nat_flags += 1
     return nat_flags
 
